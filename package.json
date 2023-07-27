@@ -1,7 +1,11 @@
 {
+"name": "cosmos_wabot",
+"version": "0.0.1",
+"description": "",
 "scripts": {
   "start": "node index.js"
 },
+  "author": "sxlmnwb",
   "dependencies": {
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
