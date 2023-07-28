@@ -10,10 +10,13 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, exponent, coi
     const latestBlockTime = new Date(time);
     const secondsAgo = Math.round((fetchedAt - latestBlockTime) / 1000);
 
+    let tokenPrice = ' -';
+    if (coingecko !== "") {
     const coingeckoApi = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${coingecko}&vs_currencies=usd`);
-    let tokenPrice = coingeckoApi.data[coingecko].usd;
+    tokenPrice = coingeckoApi.data[coingecko].usd;
     if (tokenPrice >= 1) {
         tokenPrice = tokenPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
     }    
 
     // summary

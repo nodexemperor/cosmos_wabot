@@ -26,6 +26,6 @@ module.exports = async function useStatus(network) {
         } catch (error) {
         console.error(error);
 
-        throw new Error('ERROR getting data from endpoint 💀⁉️');
+        throw new Error('ERROR getting data from dotenv 💀⁉️');
     }
 }
