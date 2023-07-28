@@ -3,16 +3,22 @@
     "version": "0.0.1",
     "description": "",
     "scripts": {
-      "start": "node index.js"
+        "build": "babel src -d dist",
+        "start": "node index.js"
     },
-      "author": "sxlmnwb",
-      "dependencies": {
+    "author": "sxlmnwb",
+    "dependencies": {
         "axios": "^1.4.0",
+        "date-fns": "^2.30.0",
         "dotenv": "^16.3.1",
-        "date-fns":"^2.30.0",
         "ping": "^0.4.4",
         "qrcode-terminal": "^0.12.0",
         "validator": "^13.9.0",
         "whatsapp-web.js": "^1.21.0"
-      }
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.22.9",
+        "@babel/core": "^7.22.9",
+        "@babel/preset-env": "^7.22.9"
+    }
 }
