@@ -1,16 +1,13 @@
 const useStatus = require('./useStatus');
 
-let intervalId;
-let network;
+let networks = {};
 
 module.exports = {
     startLoop: async (client, networkInput, intervalString, chat) => {
         if (intervalString === 'stop') {
-            stopLoop(chat);
+            stopLoop(networkInput, chat);
             return;
         }
-
-        network = networkInput;
 
         const intervalNumber = parseInt(intervalString.slice(0, -1));
         const intervalUnit = intervalString.slice(-1);
@@ -19,8 +16,9 @@ module.exports = {
             return;
         }
         const intervalMillis = intervalUnit === 'm' ? intervalNumber * 60 * 1000 : intervalNumber * 60 * 60 * 1000;
-        if (intervalId) {
-            clearInterval(intervalId);
+
+        if (networks[networkInput] && networks[networkInput].intervalId) {
+            clearInterval(networks[networkInput].intervalId);
         }
 
         let intervalUnitWord;
@@ -30,17 +28,26 @@ module.exports = {
             intervalUnitWord = intervalNumber > 1 ? 'hours' : 'hour';
         }
 
-        intervalId = setInterval(async () => {
-            const status = await useStatus(network);
-            chat.sendMessage(status);
-        }, intervalMillis);
-        chat.sendMessage(`Started sending ${network} status updates every ${intervalNumber} ${intervalUnitWord}.`);
+        networks[networkInput] = {
+            intervalId: setInterval(async () => {
+                if (networks[networkInput].lastStatusMessage) {
+                    networks[networkInput].lastStatusMessage.delete(true);
+                }
+                const status = await useStatus(networkInput);
+                networks[networkInput].lastStatusMessage = await chat.sendMessage(status);
+            }, intervalMillis)
+        };
+        chat.sendMessage(`Started sending ${networkInput} status updates every ${intervalNumber} ${intervalUnitWord}.`);
     },
 
-    stopLoop: (chat) => {
-        if (intervalId) {
-            clearInterval(intervalId);
-            intervalId = null;
+    stopLoop: async (network, chat) => {
+        if (networks[network] && networks[network].intervalId) {
+            clearInterval(networks[network].intervalId);
+            networks[network].intervalId = null;
+            if (networks[network].lastStatusMessage) {
+                networks[network].lastStatusMessage.delete(true);
+                networks[network].lastStatusMessage = null;
+            }
             chat.sendMessage(`Stopped sending ${network} status updates.`);
         } else {
             chat.sendMessage(`ERROR no status ${network} updates to stop 💀⁉️`);
