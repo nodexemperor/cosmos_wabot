@@ -40,8 +40,28 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, exponent, coi
     const signedBlocksFormatted = signedBlocks.toLocaleString();
     const missedPercentage = (missedBlocksCounter / signedBlocks) * 100;
     const uptimePercentage = (100 - missedPercentage).toFixed(2);
+
+    function convertJail(jailed) {
+        if (jailed === false) {
+          return 'No';
+        } else if (jailed === true) {
+          return 'Yes';
+        } else {
+          return jailed;
+        }
+    }
+    const jailStatus = convertJail(validator.jailed);
     
-    const statusval = validator.status.replace('BOND_STATUS_', '');
+    function convertStatus(status) {
+        if (status === 'BOND_STATUS_BONDED') {
+          return 'Active';
+        } else if (status === 'BOND_STATUS_UNBONDED') {
+          return 'Inactive';
+        } else {
+          return status;
+        }
+    }
+    const bondStatus = convertStatus(validator.status);
 
     const tokensBigInt = BigInt(validator.tokens);
     const tokensInSymbol = Number(tokensBigInt / BigInt(10 ** exponent));
@@ -53,7 +73,8 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, exponent, coi
         secondsAgo,
         tokenPrice,
         validator,
-        statusval,
+        jailStatus,
+        bondStatus,
         formattedTokens,
         missedBlocksCounter,
         signedBlocksFormatted,
