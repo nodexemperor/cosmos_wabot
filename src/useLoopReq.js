@@ -2,6 +2,20 @@ const useStatus = require('./useStatus');
 
 let networks = {};
 
+const stopLoop = async (networkInput, chat) => {
+        if (networks[networkInput] && networks[networkInput].intervalId) {
+            clearInterval(networks[networkInput].intervalId);
+            networks[networkInput].intervalId = null;
+            if (networks[networkInput].lastStatusMessage) {
+                networks[networkInput].lastStatusMessage.delete(true);
+                networks[networkInput].lastStatusMessage = null;
+            }
+            chat.sendMessage(`Stopped sending ${networkInput} status updates.`);
+            } else {
+            chat.sendMessage(`ERROR no status ${networkInput} updates to stop 💀⁉️`);
+        }
+};
+
 module.exports = {
     startLoop: async (client, networkInput, intervalString, chat) => {
         if (intervalString === 'stop') {
@@ -40,17 +54,6 @@ module.exports = {
         chat.sendMessage(`Started sending ${networkInput} status updates every ${intervalNumber} ${intervalUnitWord}.`);
     },
 
-    stopLoop: async (network, chat) => {
-        if (networks[network] && networks[network].intervalId) {
-            clearInterval(networks[network].intervalId);
-            networks[network].intervalId = null;
-            if (networks[network].lastStatusMessage) {
-                networks[network].lastStatusMessage.delete(true);
-                networks[network].lastStatusMessage = null;
-            }
-            chat.sendMessage(`Stopped sending ${network} status updates.`);
-        } else {
-            chat.sendMessage(`ERROR no status ${network} updates to stop 💀⁉️`);
-        }
-    }
-}
+    stopLoop
+
+};

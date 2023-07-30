@@ -25,9 +25,9 @@ client.on('message', async msg => {
             const network = commandParts[1];
             const intervalString = commandParts[2];
             if (intervalString === 'stop') {
-                stopLoop(chat);  // Pass the chat object to stopLoop
+                stopLoop(network, chat);
             } else {
-                startLoop(client, network, intervalString, chat);  // Pass the chat object to startLoop
+                startLoop(client, network, intervalString, chat);
             }
         } else {
             const network = msg.body.replace('/status ', '');
