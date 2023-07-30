@@ -2,10 +2,19 @@ const { Client } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const useHelpCommand = require('./useHelpCommand');
 
-module.exports = function startWhatsapp() {
+module.exports = async function startWhatsapp() {
+    const isRoot = (await import('is-root')).default;
+
+    let puppeteerArgs;
+    if (isRoot()) {
+        puppeteerArgs = ['--no-sandbox'];
+    } else {
+        puppeteerArgs = ['--disable-setuid-sandbox'];
+    }
+
     const client = new Client({
         puppeteer: {
-            args: ['--no-sandbox --disable-setuid-sandbox']
+            args: puppeteerArgs
         }
     });
 

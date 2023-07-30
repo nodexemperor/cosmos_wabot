@@ -6,7 +6,8 @@ require('dotenv').config();
 const { useStatus, usePing, useCommand, startWhatsapp } = require('./src');
 const { startLoop, stopLoop } = require('./src/useLoopReq');
 
-const client = startWhatsapp();
+const start = async () => {
+    const client = await startWhatsapp();
 
 client.on('message', async msg => {
 
@@ -58,6 +59,10 @@ client.on('message', async msg => {
         }
     }
 
-});
+    });
 
 client.initialize();
+
+}
+
+start();
