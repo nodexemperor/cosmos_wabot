@@ -1,19 +1,18 @@
-const axios = require('axios');
+const getApi = require('./getApi');
 
 module.exports = async function useApi({ apiUrl, valoper, valcons, denom, exponent, coingecko }) {
+  const apiData = await getApi({ apiUrl, coingecko, valoper, valcons });
     
     // summary
-    const summaryApi = await axios.get(`${apiUrl}/cosmos/base/tendermint/v1beta1/blocks/latest`);
-    const height = summaryApi.data.block.header.height;
-    const time = summaryApi.data.block.header.time;
+    const height = apiData.summaryApi.data.block.header.height;
+    const time = apiData.summaryApi.data.block.header.time;
     const fetchedAt = new Date();
     const latestBlockTime = new Date(time);
     const secondsAgo = Math.round((fetchedAt - latestBlockTime) / 1000);
 
     let tokenPrice = ' -';
     if (coingecko !== "") {
-    const coingeckoApi = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${coingecko}&vs_currencies=usd`);
-    tokenPrice = coingeckoApi.data[coingecko].usd;
+    tokenPrice = apiData.coingeckoApi.data[coingecko].usd;
     if (tokenPrice >= 1) {
         tokenPrice = tokenPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         }
@@ -22,16 +21,13 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
     // summary
 
     // validator
-    const validatorApi = await axios.get(`${apiUrl}/cosmos/staking/v1beta1/validators/${valoper}`);
-    const validator = validatorApi.data.validator;
+    const validator = apiData.validatorApi.data.validator;
 
     const moniker = validator.description.moniker;
 
-    const signingInfosApi = await axios.get(`${apiUrl}/cosmos/slashing/v1beta1/signing_infos/${valcons}`);
-    const missedBlocksCounter = signingInfosApi.data.val_signing_info.missed_blocks_counter;
+    const missedBlocksCounter = apiData.signingInfosApi.data.val_signing_info.missed_blocks_counter;
 
-    const slashingParamsRes = await axios.get(`${apiUrl}/cosmos/slashing/v1beta1/params`);
-    const signedBlocks = parseInt(slashingParamsRes.data.params.signed_blocks_window);
+    const signedBlocks = parseInt(apiData.slashingParamsApi.data.params.signed_blocks_window);
     const signedBlocksFormatted = signedBlocks.toLocaleString();
     const missedPercentage = (missedBlocksCounter / signedBlocks) * 100;
     const uptimePercentage = (100 - missedPercentage).toFixed(2);
@@ -58,8 +54,7 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
     }
     const bondStatus = convertStatus(validator.status);
 
-    const commissionApi = await axios.get(`${apiUrl}/cosmos/distribution/v1beta1/validators/${valoper}/commission`);
-    const commission = commissionApi.data.commission.commission;
+    const commission = apiData.commissionApi.data.commission.commission;
     let commissionAmount = null;
 
     for (let i = 0; i < commission.length; i++) {
