@@ -27,15 +27,8 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
 
     const moniker = validator.description.moniker;
 
-    const signingInfosRes = await axios.get(`${apiUrl}/cosmos/slashing/v1beta1/signing_infos`);
-    const signingInfos = signingInfosRes.data.info;
-    let missedBlocksCounter = 'N/A';
-    for (const info of signingInfos) {
-        if (info.address === valcons) {
-            missedBlocksCounter = info.missed_blocks_counter;
-            break;
-        }
-    }
+    const signingInfosApi = await axios.get(`${apiUrl}/cosmos/slashing/v1beta1/signing_infos/${valcons}`);
+    const missedBlocksCounter = signingInfosApi.data.val_signing_info.missed_blocks_counter;
 
     const slashingParamsRes = await axios.get(`${apiUrl}/cosmos/slashing/v1beta1/params`);
     const signedBlocks = parseInt(slashingParamsRes.data.params.signed_blocks_window);
