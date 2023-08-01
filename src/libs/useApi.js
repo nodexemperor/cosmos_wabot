@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-module.exports = async function useApi({ apiUrl, valoper, valcons, exponent, coingecko }) {
+module.exports = async function useApi({ apiUrl, valoper, valcons, denom, exponent, coingecko }) {
     
     // summary
     const summaryApi = await axios.get(`${apiUrl}/cosmos/base/tendermint/v1beta1/blocks/latest`);
@@ -24,6 +24,8 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, exponent, coi
     // validator
     const validatorApi = await axios.get(`${apiUrl}/cosmos/staking/v1beta1/validators/${valoper}`);
     const validator = validatorApi.data.validator;
+
+    const moniker = validator.description.moniker;
 
     const signingInfosRes = await axios.get(`${apiUrl}/cosmos/slashing/v1beta1/signing_infos`);
     const signingInfos = signingInfosRes.data.info;
@@ -63,19 +65,35 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, exponent, coi
     }
     const bondStatus = convertStatus(validator.status);
 
-    const tokensBigInt = BigInt(validator.tokens);
-    const tokensInSymbol = Number(tokensBigInt / BigInt(10 ** exponent));
-    const formattedTokens = tokensInSymbol.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const commissionApi = await axios.get(`${apiUrl}/cosmos/distribution/v1beta1/validators/${valoper}/commission`);
+    const commission = commissionApi.data.commission.commission;
+    let commissionAmount = null;
+
+    for (let i = 0; i < commission.length; i++) {
+      if (commission[i].denom === denom) {
+        commissionAmount = commission[i].amount;
+        break;
+      }
+    }
+
+    let commissions = "N/A";
+    if (commissionAmount) {
+    const commissionFormated = parseFloat(commissionAmount) / (10 ** exponent);
+    commissions = commissionFormated.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2});}
+
+    const bondedFormated = Number(BigInt(validator.tokens) / BigInt(10 ** exponent));
+    const totalBonded = bondedFormated.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     // validator
 
     return {
         height,
         secondsAgo,
         tokenPrice,
-        validator,
+        moniker,
         jailStatus,
         bondStatus,
-        formattedTokens,
+        commissions,
+        totalBonded,
         missedBlocksCounter,
         signedBlocksFormatted,
         uptimePercentage };

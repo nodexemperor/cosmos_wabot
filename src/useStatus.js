@@ -12,11 +12,12 @@ module.exports = async function useStatus(network) {
                            `Token Price: $${api.tokenPrice}\n\n`;
 
         const validatorInfo = `*VALIDATOR INFO*\n` +
-                              `Moniker: ${api.validator.description.moniker}\n` +
+                              `Moniker: ${api.moniker}\n` +
                               `Uptime: ${api.uptimePercentage}% / (${api.missedBlocksCounter} of ${api.signedBlocksFormatted} Blocks)\n` +
                               `Status: ${api.bondStatus}\n` +
                               `Jailed: ${api.jailStatus}\n` +
-                              `Total Bonded: ${api.formattedTokens} ${vars.symbol}`;
+                              `Commission: ${api.commissions} ${vars.symbol}\n` +
+                              `Total Bonded: ${api.totalBonded} ${vars.symbol}`;
 
         return statusNode + validatorInfo;
         } catch (error) {
