@@ -3,6 +3,14 @@ const { useVariable, useApi } = require('./libs');
 module.exports = async function useStatus(network) {
     
     const vars = useVariable(network);
+
+    const requiredVars = ['apiUrl', 'valoper', 'valcons', 'denom', 'symbol', 'exponent'];
+    for (const varName of requiredVars) {
+        if (!vars[varName]) {
+            throw new Error(`[${network}] not response ${varName} check your .env`);
+        }
+    }
+
     try {
 
         const api = await useApi(vars);
@@ -22,8 +30,6 @@ module.exports = async function useStatus(network) {
         return statusNode + validatorInfo;
         } catch (error) {
         console.error(error);
-
-    throw new Error(`ERROR getting API from ${vars.apiUrl} 💀⁉️`);
     
     }
 }

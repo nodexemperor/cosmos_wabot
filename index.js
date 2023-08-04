@@ -33,17 +33,16 @@ client.on('message', async msg => {
         } else {
             const network = msg.body.replace('/status ', '');
             if (network !== '--help') {
-                useStatus(network)
-                    .then(info => {
-                        msg.reply(info);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                        msg.reply(error.message);
-                    });
+              try {
+                const info = await useStatus(network);
+                msg.reply(info);
+              } catch (error) {
+                console.error(error);
+                msg.reply(`WARN ${network} not response, please check your log 💀⁉️`);
+              }
             }
+          }
         }
-    }
 
     if (msg.body.startsWith('/ping ')) {
         const url = msg.body.replace('/ping ', '');
