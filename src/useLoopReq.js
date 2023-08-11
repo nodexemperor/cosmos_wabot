@@ -4,12 +4,14 @@ const useMainnet = require('./useMainnet');
 let networks = {};
 
 const stopLoop = async (networkInputs, chat) => {
-    networkInputs.forEach(networkInput => {
+    networkInputs.forEach(async networkInput => {
         if (networks[networkInput] && networks[networkInput].intervalId) {
             clearInterval(networks[networkInput].intervalId);
+            clearInterval(networks[networkInput].messageIntervalId);
             networks[networkInput].intervalId = null;
+            networks[networkInput].messageIntervalId = null;
             if (networks[networkInput].lastStatusMessage) {
-                networks[networkInput].lastStatusMessage.delete(true);
+                await networks[networkInput].lastStatusMessage.delete(true);
                 networks[networkInput].lastStatusMessage = null;
             }
             chat.sendMessage(`Stopped sending ${networkInput} status updates.`);
@@ -58,28 +60,33 @@ module.exports = {
             };
         });
         
-        let lastStatusMessage;
-        setInterval(async () => {
+        const messageIntervalId = setInterval(async () => {
             let statusMessage = '';
             for (const networkInput of networkInputs) {
                 if (networks[networkInput].lastStatusMainnet) {
-                    statusMessage += networks[networkInput].lastStatusMainnet + '\n\n';
+                    statusMessage += networks[networkInput].lastStatusMainnet + `\n------------------------------------------------------------------\n`;
                 }
             }
         
-            if (lastStatusMessage) {
-                await lastStatusMessage.delete(true);
-            }
+            networkInputs.forEach(async networkInput => {
+                if (networks[networkInput].lastStatusMessage) {
+                    await networks[networkInput].lastStatusMessage.delete(true);
+                }
+            });
         
-            lastStatusMessage = await chat.sendMessage(statusMessage.trim());
-
+            const newStatusMessage = await chat.sendMessage(statusMessage.trim());
+        
             networkInputs.forEach(networkInput => {
-                networks[networkInput].lastStatusMessage = lastStatusMessage;
+                networks[networkInput].lastStatusMessage = newStatusMessage;
             });
         }, intervalMillis);
 
+        networkInputs.forEach(networkInput => {
+            networks[networkInput].messageIntervalId = messageIntervalId;
+        });
+        
         chat.sendMessage(`Started sending ${networkInputs.join(', ')} status updates every ${intervalNumber} ${intervalUnitWord}.`);
     },
-
+        
     stopLoop
 };
