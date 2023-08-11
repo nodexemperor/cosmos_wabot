@@ -12,6 +12,6 @@ module.exports = function useHelpCommand() {
             '```/testnet [prompt]```\n' +
             '```/help```\n\n' +
             '```SOURCE CODE :```\n' +
-            'https://github.com/sxlmnwb/cosmos_wabot'            
+            'https://github.com/nodexemperor/cosmos_wabot'            
         );
     }
