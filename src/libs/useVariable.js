@@ -17,9 +17,9 @@ module.exports = function useVariable(network) {
     const apiUrl = variables['API'];
     const valoper = variables['VALOPER'];
     const valcons = variables['VALCONS'];
-    const denom = variables['DENOM'];
-    const exponent = variables['EXPONENT'];
-    const symbol = variables['SYMBOL'];
+    const denom = variables['DENOM'] || "";
+    const exponent = variables['EXPONENT'] || "";
+    const symbol = variables['SYMBOL'] || "";
     const coingecko = variables['COINGECKO'] || "";
 
     return { 

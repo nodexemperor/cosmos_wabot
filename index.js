@@ -3,7 +3,7 @@
 //
 
 require('dotenv').config();
-const { useStatus, usePing, useCommand, startWhatsapp } = require('./src');
+const { useMainnet, useTestnet, usePing, useCommand, startWhatsapp } = require('./src');
 const { startLoop, stopLoop } = require('./src/useLoopReq');
 
 const start = async () => {
@@ -20,29 +20,53 @@ client.on('message', async msg => {
         msg.reply(reply);
     }
 
-    if (msg.body.startsWith('/status ')) {
+    if (msg.body.startsWith('/mainnet ')) {
         const commandParts = msg.body.split(' ');
-        if (commandParts.length === 3) {
-            const network = commandParts[1];
-            const intervalString = commandParts[2];
-            if (intervalString === 'stop') {
-                stopLoop(network, chat);
+        if (commandParts.length >= 3) {
+            const networks = commandParts.slice(1, -1);
+            const intervalString = commandParts[commandParts.length - 1];
+            if (intervalString === '--stop') {
+                stopLoop(networks, chat);
             } else {
-                startLoop(client, network, intervalString, chat);
+                startLoop(client, networks, intervalString, chat);
             }
-        } else {
-            const network = msg.body.replace('/status ', '');
+        } else if (commandParts.length === 2) {
+            const network = commandParts[1];
             if (network !== '--help') {
-              try {
-                const info = await useStatus(network);
-                msg.reply(info);
-              } catch (error) {
-                console.error(error);
-                msg.reply(`WARN ${network} not response, please check your log 💀⁉️`);
-              }
+                try {
+                    const info = await useMainnet(network);
+                    msg.reply(info);
+                } catch (error) {
+                    console.error(error);
+                    msg.reply(`WARN ${network} on mainnet not response, please check your log 💀⁉️`);
+                }
             }
-          }
         }
+    }
+
+    if (msg.body.startsWith('/testnet ')) {
+        const commandParts = msg.body.split(' ');
+        if (commandParts.length >= 3) {
+            const networks = commandParts.slice(1, -1);
+            const intervalString = commandParts[commandParts.length - 1];
+            if (intervalString === '--stop') {
+                stopLoop(networks, chat);
+            } else {
+                startLoop(client, networks, intervalString, chat);
+            }
+        } else if (commandParts.length === 2) {
+            const network = commandParts[1];
+            if (network !== '--help') {
+                try {
+                    const info = await useTestnet(network);
+                    msg.reply(info);
+                } catch (error) {
+                    console.error(error);
+                    msg.reply(`WARN ${network} on testnet not response, please check your log 💀⁉️`);
+                }
+            }
+        }
+    }
 
     if (msg.body.startsWith('/ping ')) {
         const url = msg.body.replace('/ping ', '');

@@ -3,5 +3,6 @@ module.exports = {
     useCommand: require('./useCommand'),
     // useHelpCommand: require('./useHelpCommand'),
     usePing: require('./usePing'),
-    useStatus: require('./useStatus'),
+    useMainnet: require('./useMainnet'),
+    useTestnet: require('./useTestnet'),
 };

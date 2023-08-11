@@ -1,6 +1,6 @@
 const { useVariable, useApi } = require('./libs');
 
-module.exports = async function useStatus(network) {
+module.exports = async function useMainnet(network) {
     
     const vars = useVariable(network);
 
@@ -16,6 +16,7 @@ module.exports = async function useStatus(network) {
         const api = await useApi(vars);
 
         const statusNode = `*SUMMARY*\n` +
+                           `Chain ID: ${api.chainId}\n` +
                            `Latest Block: ${api.height} (${api.secondsAgo} sec ago)\n` +
                            `Token Price: $${api.tokenPrice}\n\n`;
 

@@ -1,8 +1,10 @@
-const useStatus = require('./useStatus');
+const useMainnet = require('./useMainnet');
+// const useTestnet = require('./useTestnet');
 
 let networks = {};
 
-const stopLoop = async (networkInput, chat) => {
+const stopLoop = async (networkInputs, chat) => {
+    networkInputs.forEach(networkInput => {
         if (networks[networkInput] && networks[networkInput].intervalId) {
             clearInterval(networks[networkInput].intervalId);
             networks[networkInput].intervalId = null;
@@ -11,29 +13,26 @@ const stopLoop = async (networkInput, chat) => {
                 networks[networkInput].lastStatusMessage = null;
             }
             chat.sendMessage(`Stopped sending ${networkInput} status updates.`);
-            } else {
+        } else {
             chat.sendMessage(`ERROR no status ${networkInput} updates to stop 💀⁉️`);
         }
+    });
 };
 
 module.exports = {
-    startLoop: async (client, networkInput, intervalString, chat) => {
-        if (intervalString === 'stop') {
-            stopLoop(networkInput, chat);
+    startLoop: async (client, networkInputs, intervalString, chat) => {
+        if (intervalString === '--stop') {
+            stopLoop(networkInputs, chat);
             return;
         }
 
         const intervalNumber = parseInt(intervalString.slice(0, -1));
         const intervalUnit = intervalString.slice(-1);
         if (isNaN(intervalNumber) || (intervalUnit !== 'm' && intervalUnit !== 'h')) {
-            chat.sendMessage('Invalid command format. Use ```/status <network> <interval | stop>```, where ```<interval>``` is a number followed by "m" (for minutes) or "h" (for hours).');
+            chat.sendMessage('Invalid command format. Use ```/status <network> <interval | --stop>```, where ```<interval>``` is a number followed by "m" (for minutes) or "h" (for hours).');
             return;
         }
         const intervalMillis = intervalUnit === 'm' ? intervalNumber * 60 * 1000 : intervalNumber * 60 * 60 * 1000;
-
-        if (networks[networkInput] && networks[networkInput].intervalId) {
-            clearInterval(networks[networkInput].intervalId);
-        }
 
         let intervalUnitWord;
         if (intervalUnit === 'm') {
@@ -42,18 +41,45 @@ module.exports = {
             intervalUnitWord = intervalNumber > 1 ? 'hours' : 'hour';
         }
 
-        networks[networkInput] = {
-            intervalId: setInterval(async () => {
-                if (networks[networkInput].lastStatusMessage) {
-                    networks[networkInput].lastStatusMessage.delete(true);
+        networkInputs.forEach(networkInput => {
+            if (networks[networkInput] && networks[networkInput].intervalId) {
+                clearInterval(networks[networkInput].intervalId);
+            }
+        
+            const updateStatus = async () => {
+                const statusMainnet = await useMainnet(networkInput);
+                networks[networkInput].lastStatusMainnet = statusMainnet;
+            };
+
+            updateStatus();
+
+            networks[networkInput] = {
+                intervalId: setInterval(updateStatus, intervalMillis)
+            };
+        });
+        
+        let lastStatusMessage;
+        setInterval(async () => {
+            let statusMessage = '';
+            for (const networkInput of networkInputs) {
+                if (networks[networkInput].lastStatusMainnet) {
+                    statusMessage += networks[networkInput].lastStatusMainnet + '\n\n';
                 }
-                const status = await useStatus(networkInput);
-                networks[networkInput].lastStatusMessage = await chat.sendMessage(status);
-            }, intervalMillis)
-        };
-        chat.sendMessage(`Started sending ${networkInput} status updates every ${intervalNumber} ${intervalUnitWord}.`);
+            }
+        
+            if (lastStatusMessage) {
+                await lastStatusMessage.delete(true);
+            }
+        
+            lastStatusMessage = await chat.sendMessage(statusMessage.trim());
+
+            networkInputs.forEach(networkInput => {
+                networks[networkInput].lastStatusMessage = lastStatusMessage;
+            });
+        }, intervalMillis);
+
+        chat.sendMessage(`Started sending ${networkInputs.join(', ')} status updates every ${intervalNumber} ${intervalUnitWord}.`);
     },
 
     stopLoop
-
 };

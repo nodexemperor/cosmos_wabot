@@ -5,6 +5,7 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
     
     // summary
     const height = apiData.summaryApi.data.block.header.height;
+    const chainId = apiData.summaryApi.data.block.header.chain_id;
     const time = apiData.summaryApi.data.block.header.time;
     const fetchedAt = new Date();
     const latestBlockTime = new Date(time);
@@ -75,6 +76,7 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
 
     return {
         height,
+        chainId,
         secondsAgo,
         tokenPrice,
         moniker,
