@@ -4,7 +4,7 @@
 
 require('dotenv').config();
 const { useMainnet, useTestnet, usePing, useCommand, startWhatsapp } = require('./src');
-const { startLoop, stopLoop } = require('./src/useLoopReq');
+const { startMainnetLoop, startTestnetLoop, stopLoop } = require('./src/useLoopReq');
 
 const start = async () => {
     const client = await startWhatsapp();
@@ -28,7 +28,7 @@ client.on('message', async msg => {
             if (intervalString === '--stop') {
                 stopLoop(networks, chat);
             } else {
-                startLoop(client, networks, intervalString, chat);
+                startMainnetLoop(client, networks, intervalString, chat);
             }
         } else if (commandParts.length === 2) {
             const network = commandParts[1];
@@ -52,7 +52,7 @@ client.on('message', async msg => {
             if (intervalString === '--stop') {
                 stopLoop(networks, chat);
             } else {
-                startLoop(client, networks, intervalString, chat);
+                startTestnetLoop(client, networks, intervalString, chat);
             }
         } else if (commandParts.length === 2) {
             const network = commandParts[1];
