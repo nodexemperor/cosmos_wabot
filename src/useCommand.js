@@ -13,7 +13,7 @@ module.exports = function useCommand(msg) {
             return '```/testnet <network>```\n```/testnet <network> <interval>```\n```/testnet --help```';
             
         case '/testnet --help':
-            return 'This tool was created to very simplify validator monitoring with cosmos based node, with .env COSMOS_* variables that you can customize.\n\nFor use ```/testnet <network> <interval | --stop>```, where ```<interval>``` is a number followed by "m" (for minutes) or "h" (for hours).\n\nFor example :\n```/testnet cosmost```\n```/testnet cosmost 1m```\n```/testnet cosmost 12h```\n```/testnet cosmost --stop```';
+            return 'This tool was created to very simplify validator monitoring with cosmos based node, with .env COSMOST_* variables that you can customize.\n\nFor use ```/testnet <network> <interval | --stop>```, where ```<interval>``` is a number followed by "m" (for minutes) or "h" (for hours).\n\nFor example :\n```/testnet cosmost```\n```/testnet cosmost 1m```\n```/testnet cosmost 12h```\n```/testnet cosmost --stop```';
         
         case '/ping':
             return '```/ping <destination>```\n```/ping --help```';

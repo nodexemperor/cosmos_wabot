@@ -25,20 +25,34 @@ client.on('message', async msg => {
         if (commandParts.length >= 3) {
             const networks = commandParts.slice(1, -1);
             const intervalString = commandParts[commandParts.length - 1];
+            const errors = [];
+    
             if (intervalString === '--stop') {
                 stopLoop(networks, chat);
             } else {
-                startMainnetLoop(client, networks, intervalString, chat);
+                for (const network of networks) {
+                    try {
+                        await useMainnet(network);
+                    } catch (error) {
+                        console.error(error);
+                        errors.push(error.message);
+                    }
+                }
+                if (errors.length > 0) {
+                    msg.reply(errors.join('\n'));
+                } else {
+                    startMainnetLoop(client, networks, intervalString, chat);
+                }
             }
+
         } else if (commandParts.length === 2) {
             const network = commandParts[1];
             if (network !== '--help') {
                 try {
-                    const info = await useMainnet(network);
-                    msg.reply(info);
+                    await useMainnet(network);
                 } catch (error) {
                     console.error(error);
-                    msg.reply(`WARN ${network} on mainnet not response, please check your log 💀⁉️`);
+                    msg.reply(error.message);
                 }
             }
         }
@@ -49,20 +63,34 @@ client.on('message', async msg => {
         if (commandParts.length >= 3) {
             const networks = commandParts.slice(1, -1);
             const intervalString = commandParts[commandParts.length - 1];
+            const errors = [];
+    
             if (intervalString === '--stop') {
                 stopLoop(networks, chat);
             } else {
-                startTestnetLoop(client, networks, intervalString, chat);
+                for (const network of networks) {
+                    try {
+                        await useTestnet(network);
+                    } catch (error) {
+                        console.error(error);
+                        errors.push(error.message);
+                    }
+                }
+                if (errors.length > 0) {
+                    msg.reply(errors.join('\n'));
+                } else {
+                    startTestnetLoop(client, networks, intervalString, chat);
+                }
             }
+
         } else if (commandParts.length === 2) {
             const network = commandParts[1];
             if (network !== '--help') {
                 try {
-                    const info = await useTestnet(network);
-                    msg.reply(info);
+                    await useTestnet(network);
                 } catch (error) {
                     console.error(error);
-                    msg.reply(`WARN ${network} on testnet not response, please check your log 💀⁉️`);
+                    msg.reply(error.message);
                 }
             }
         }
