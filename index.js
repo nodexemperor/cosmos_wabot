@@ -3,6 +3,7 @@
 //
 
 require('dotenv').config();
+const chalk = require('chalk');
 const { useMainnet, useTestnet, usePing, useCommand, startWhatsapp } = require('./src');
 const { startMainnetLoop, startTestnetLoop, stopLoop } = require('./src/useLoopReq');
 
@@ -11,7 +12,22 @@ const start = async () => {
 
 client.on('message', async msg => {
 
-    console.log('received message: ' + msg.body, '| fromID: ' + msg.from);
+    const user = await msg.getContact();
+    const userName = user.pushname || user.verifiedName || user.formattedName;
+    const time = new Date().toLocaleString().split(', ')[1];
+    const idMessage = msg.id._serialized.split('_').pop();
+    const number = msg.from.replace('@c.us', '');
+
+    console.log(chalk.white.bgGreenBright.bold('RECEIVED') +
+    " [" + chalk.blueBright(`${msg.body}`) + "] " +
+    chalk.green('ID') +
+    " [" + chalk.blueBright(`${idMessage}`) + "] " +
+    chalk.green('SENDER') +
+    " [" + chalk.blueBright(`${userName}`) + "] " +
+    chalk.green('NUMBER') +
+    " [" + chalk.blueBright(`+${number}`) + "] " +
+    chalk.green('TIME') +
+    " [" + chalk.blueBright(`${time}`) + "]");
 
     const chat = await msg.getChat();
 
