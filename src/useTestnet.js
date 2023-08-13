@@ -4,10 +4,10 @@ module.exports = async function useTestnet(network) {
     
     const vars = useVariable(network);
 
-    const requiredVars = ['apiUrl', 'valoper', 'valcons'];
-    for (const varName of requiredVars) {
+    const requiredVars = {'apiUrl': `API`, 'valoper': `VALOPER`, 'valcons': `VALCONS`};
+    for (const varName in requiredVars) {
         if (!vars[varName]) {
-            throw new Error(`[${network}] not response ${varName} check your .env`);
+        throw new Error(`[${network}] doesn't have ${network.toUpperCase()}_${requiredVars[varName]} check your .env`);
         }
     }
 

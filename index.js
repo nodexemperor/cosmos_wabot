@@ -49,7 +49,7 @@ client.on('message', async msg => {
             const network = commandParts[1];
             if (network !== '--help') {
                 try {
-                    await useMainnet(network);
+                    msg.reply(await useMainnet(network));
                 } catch (error) {
                     console.error(error);
                     msg.reply(error.message);
@@ -87,7 +87,7 @@ client.on('message', async msg => {
             const network = commandParts[1];
             if (network !== '--help') {
                 try {
-                    await useTestnet(network);
+                    msg.reply(await useTestnet(network));
                 } catch (error) {
                     console.error(error);
                     msg.reply(error.message);

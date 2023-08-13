@@ -7,9 +7,6 @@ module.exports = function useVariable(network) {
     for (const variable in process.env) {
         if (pattern.test(variable)) {
             const key = variable.replace(pattern, '');
-            if (!process.env[variable] && variable !== `${variable}`) {
-                throw new Error(`ERROR missing environment variable: ${variable} 💀⁉️`);
-            }
             variables[key] = process.env[variable];
         }
     }
