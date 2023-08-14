@@ -7,7 +7,7 @@ module.exports = async function useMainnet(network) {
     const requiredVars = {'apiUrl': `API`, 'valoper': `VALOPER`, 'valcons': `VALCONS`, 'denom': `DENOM`, 'symbol': `SYMBOL`, 'exponent': `EXPONENT` };
     for (const varName in requiredVars) {
         if (!vars[varName]) {
-        throw new Error(`[${network}] doesn't have ${network.toUpperCase()}_${requiredVars[varName]} check your .env`);
+        throw new Error(`${network.toUpperCase()}_${requiredVars[varName]} 💀⁉️ please check your .env`);
         }
     }
 

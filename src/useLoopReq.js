@@ -1,10 +1,12 @@
 const useMainnet = require('./useMainnet');
 const useTestnet = require('./useTestnet');
+const chalk = require('chalk');
 
 let networks = {};
 
 const stopLoop = async (networkInputs, chat) => {
-    networkInputs.forEach(async networkInput => {
+    let messages = [];
+    for (const networkInput of networkInputs) {
         if (networks[networkInput]) {
             if (networks[networkInput].intervalId) {
                 clearInterval(networks[networkInput].intervalId);
@@ -14,12 +16,13 @@ const stopLoop = async (networkInputs, chat) => {
                 await networks[networkInput].lastStatusMessage.delete(true);
                 networks[networkInput].lastStatusMessage = null;
             }
-            chat.sendMessage(`Stopped sending ${networkInput} status updates.`);
+            messages.push(`Stopped sending ${networkInput} status updates.`);
             delete networks[networkInput];
         } else {
-            chat.sendMessage(`ERROR no status ${networkInput} updates to stop 💀⁉️`);
+            messages.push(`ERROR no status ${networkInput} updates to stop 💀⁉️`);
         }
-    });
+    }
+    return messages;
 };
 
 module.exports = {
@@ -53,7 +56,9 @@ module.exports = {
         
             const updateStatus = async () => {
                 const statusMainnet = await useMainnet(networkInput);
+                if (networks[networkInput]) { 
                 networks[networkInput].lastStatusMainnet = statusMainnet;
+                }
             };
 
             updateStatus();
@@ -76,7 +81,7 @@ module.exports = {
                     try {
                         await networks[networkInput].lastStatusMessage.delete(true);
                     } catch (error) {
-                        console.error(`WARN [${networkInput}] not delete`);
+                        console.log(chalk.white.bgYellowBright.bold('WARN') + " [" + chalk.greenBright(`${networkInput}`) + "] CONTINUE FOR LOOPING");
                     }
                     networks[networkInput].lastStatusMessage = null;
                 }
@@ -97,6 +102,10 @@ module.exports = {
             if (networks[networkInput]) {
                 networks[networkInput].messageIntervalId = messageIntervalId;
             }
+        
+            // const startMessage = `Started sending mainnet ${networkInputs.join(', ')} status updates every ${intervalNumber} ${intervalUnitWord}.`;
+            // startMessages.push(startMessage);
+
         });
 
         chat.sendMessage(`Started sending mainnet ${networkInputs.join(', ')} status updates every ${intervalNumber} ${intervalUnitWord}.`);

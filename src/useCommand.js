@@ -3,8 +3,25 @@ const useTestnet = require('./useTestnet');
 const usePing = require('./usePing');
 const { startMainnetLoop, startTestnetLoop, stopLoop } = require('./useLoopReq');
 const useHelpCommand = require('./useHelpCommand');
+const chalk = require('chalk');
 
 module.exports = async function useCommand(msg, client, chat) {
+    
+    const user = await msg.getContact();
+    const userName = user.pushname || user.verifiedName || user.formattedName;
+    const time = new Date().toLocaleString().split(', ')[1];
+    const idMessage = msg.id._serialized.split('_').pop();
+    // const number = msg.from.replace('@c.us', '');
+
+    console.log(chalk.white.bgYellowBright.bold('RECEIVED') +
+    " [" + chalk.blueBright(`${msg.body}`) + "] " +
+    chalk.green('ID') +
+    " [" + chalk.blueBright(`${idMessage}`) + "] " +
+    chalk.green('SENDER') +
+    " [" + chalk.blueBright(`${userName}`) + "] " +
+    chalk.green('TIME') +
+    " [" + chalk.blueBright(`${time}`) + "]");
+
     switch (msg.body) {
         
         case '/mainnet':
@@ -37,13 +54,39 @@ module.exports = async function useCommand(msg, client, chat) {
                         const errors = [];
     
                         if (intervalString === '--stop') {
-                            stopLoop(networks, chat);
+                                if (errors.length > 0) {
+                                     msg.reply(errors.join('\n'));
+                                } else { 
+                                    const stopMessages = await stopLoop(networks, chat);
+                                    for (const stopMessage of stopMessages) {
+                                        const sentMsg = await msg.reply(stopMessage);
+                                        const idMessageBot = sentMsg.id._serialized.split('_').pop();
+                                        console.log(chalk.white.bgRedBright.bold('STOPING') +
+                                            " [" + chalk.redBright(`${stopMessage}`) + "] " +
+                                            chalk.green('ID') +
+                                            " [" + chalk.blueBright(`${idMessageBot}`) + "] " +
+                                            chalk.green('RECIPIENT') +
+                                            " [" + chalk.blueBright(`${userName}`) + "] " +
+                                            chalk.green('TIME') +
+                                            " [" + chalk.blueBright(`${time}`) + "]");
+                                        }
+                                    }
                         } else {
                             for (const network of networks) {
                                 try {
                                     await useMainnet(network);
+                                    console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.greenBright(`${network}`) + "] PREPERING FOR LOOPING");
                                 } catch (error) {
-                                    console.error(error);
+                                const sentMsg = await msg.reply(error);
+                                const idMessageBot = sentMsg.id._serialized.split('_').pop();
+                                    console.log(chalk.white.bgRedBright.bold('ERROR') +
+                                        " [" + chalk.redBright(`${error.message}`) + "] " +
+                                        chalk.green('ID') +
+                                        " [" + chalk.blueBright(`${idMessageBot}`) + "] " +
+                                        chalk.green('RECIPIENT') +
+                                        " [" + chalk.blueBright(`${userName}`) + "] " +
+                                        chalk.green('TIME') +
+                                        " [" + chalk.blueBright(`${time}`) + "]");
                                     errors.push(error.message);
                                 }
                             }
@@ -59,9 +102,18 @@ module.exports = async function useCommand(msg, client, chat) {
                         if (network !== '--help') {
                             try {
                                 msg.reply(await useMainnet(network));
+                                console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.greenBright(`${network}`) + "] STATUS");
                             } catch (error) {
-                                console.error(error);
-                                msg.reply(error.message);
+                                const sentMsg = await msg.reply(error.message);
+                                const idMessageBot = sentMsg.id._serialized.split('_').pop();
+                                    console.log(chalk.white.bgRedBright.bold('ERROR') +
+                                        " [" + chalk.redBright(`${error.message}`) + "] " +
+                                        chalk.green('ID') +
+                                        " [" + chalk.blueBright(`${idMessageBot}`) + "] " +
+                                        chalk.green('RECIPIENT') +
+                                        " [" + chalk.blueBright(`${userName}`) + "] " +
+                                        chalk.green('TIME') +
+                                        " [" + chalk.blueBright(`${time}`) + "]");
                             }
                         }
                     }
