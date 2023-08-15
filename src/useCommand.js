@@ -61,7 +61,7 @@ module.exports = async function useCommand(msg, client, chat) {
                                     for (const stopMessage of stopMessages) {
                                         const sentMsg = await msg.reply(stopMessage);
                                         const idMessageBot = sentMsg.id._serialized.split('_').pop();
-                                        console.log(chalk.white.bgRedBright.bold('STOPING') +
+                                        console.log(chalk.white.bgRedBright.bold('STOPPING') +
                                             " [" + chalk.redBright(`${stopMessage}`) + "] " +
                                             chalk.green('ID') +
                                             " [" + chalk.blueBright(`${idMessageBot}`) + "] " +
@@ -75,7 +75,7 @@ module.exports = async function useCommand(msg, client, chat) {
                             for (const network of networks) {
                                 try {
                                     await useMainnet(network);
-                                    console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.greenBright(`${network}`) + "] PREPERING FOR LOOPING");
+                                    console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.greenBright(`${network}`) + "] PREPARING FOR LOOPING");
                                 } catch (error) {
                                 const sentMsg = await msg.reply(error);
                                 const idMessageBot = sentMsg.id._serialized.split('_').pop();
