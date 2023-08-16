@@ -59,34 +59,17 @@ module.exports = async function useCommand(msg, client, chat) {
                                 } else { 
                                     const stopMessages = await stopLoop(networks, chat);
                                     for (const stopMessage of stopMessages) {
-                                        const sentMsg = await msg.reply(stopMessage);
-                                        const idMessageBot = sentMsg.id._serialized.split('_').pop();
-                                        console.log(chalk.white.bgRedBright.bold('STOPING') +
-                                            " [" + chalk.redBright(`${stopMessage}`) + "] " +
-                                            chalk.green('ID') +
-                                            " [" + chalk.blueBright(`${idMessageBot}`) + "] " +
-                                            chalk.green('RECIPIENT') +
-                                            " [" + chalk.blueBright(`${userName}`) + "] " +
-                                            chalk.green('TIME') +
-                                            " [" + chalk.blueBright(`${time}`) + "]");
+                                        await msg.reply(stopMessage)
+                                        console.log(chalk.white.bgRedBright.bold('STOPING') + " [" + chalk.redBright(`${stopMessage}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                         }
                                     }
                         } else {
                             for (const network of networks) {
                                 try {
-                                    await useMainnet(network);
-                                    console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.greenBright(`${network}`) + "] PREPERING FOR LOOPING");
+                                    // await useMainnet(network);
+                                    console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPERING FOR LOOPING");
                                 } catch (error) {
-                                const sentMsg = await msg.reply(error);
-                                const idMessageBot = sentMsg.id._serialized.split('_').pop();
-                                    console.log(chalk.white.bgRedBright.bold('ERROR') +
-                                        " [" + chalk.redBright(`${error.message}`) + "] " +
-                                        chalk.green('ID') +
-                                        " [" + chalk.blueBright(`${idMessageBot}`) + "] " +
-                                        chalk.green('RECIPIENT') +
-                                        " [" + chalk.blueBright(`${userName}`) + "] " +
-                                        chalk.green('TIME') +
-                                        " [" + chalk.blueBright(`${time}`) + "]");
+                                    console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                     errors.push(error.message);
                                 }
                             }
@@ -102,18 +85,10 @@ module.exports = async function useCommand(msg, client, chat) {
                         if (network !== '--help') {
                             try {
                                 msg.reply(await useMainnet(network));
-                                console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.greenBright(`${network}`) + "] STATUS");
+                                console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.blueBright(`${network}`) + "] STATUS " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                             } catch (error) {
-                                const sentMsg = await msg.reply(error.message);
-                                const idMessageBot = sentMsg.id._serialized.split('_').pop();
-                                    console.log(chalk.white.bgRedBright.bold('ERROR') +
-                                        " [" + chalk.redBright(`${error.message}`) + "] " +
-                                        chalk.green('ID') +
-                                        " [" + chalk.blueBright(`${idMessageBot}`) + "] " +
-                                        chalk.green('RECIPIENT') +
-                                        " [" + chalk.blueBright(`${userName}`) + "] " +
-                                        chalk.green('TIME') +
-                                        " [" + chalk.blueBright(`${time}`) + "]");
+                                await msg.reply(error.message)
+                                console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                             }
                         }
                     }
@@ -126,13 +101,22 @@ module.exports = async function useCommand(msg, client, chat) {
                         const errors = [];
     
                         if (intervalString === '--stop') {
-                            stopLoop(networks, chat);
-                        } else {
+                            if (errors.length > 0) {
+                                 msg.reply(errors.join('\n'));
+                            } else { 
+                                const stopMessages = await stopLoop(networks, chat);
+                                for (const stopMessage of stopMessages) {
+                                    await msg.reply(stopMessage)
+                                    console.log(chalk.white.bgRedBright.bold('STOPING') + " [" + chalk.redBright(`${stopMessage}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
+                                    }
+                                }
+                    } else {
                             for (const network of networks) {
                                 try {
-                                    await useTestnet(network);
+                                    // await useTestnet(network);
+                                    console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPERING FOR LOOPING");
                                 } catch (error) {
-                                    console.error(error);
+                                    console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                     errors.push(error.message);
                                 }
                             }
@@ -148,8 +132,9 @@ module.exports = async function useCommand(msg, client, chat) {
                         if (network !== '--help') {
                             try {
                                 msg.reply(await useTestnet(network));
+                                console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.blueBright(`${network}`) + "] STATUS " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                             } catch (error) {
-                                console.error(error);
+                                console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                 msg.reply(error.message);
                             }
                         }
@@ -158,10 +143,10 @@ module.exports = async function useCommand(msg, client, chat) {
                     const url = msg.body.replace('/ping ', '');
                     if (url !== '--help') {
                         try {
-                            const response = await usePing(url);
-                            msg.reply(response);
+                            msg.reply(await usePing(url));
+                            console.log(chalk.white.bgGreenBright.bold('SUCCESS') + " [" + chalk.blueBright(`${url}`) + "] STATUS " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                         } catch (error) {
-                            console.error(error);
+                            console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                             msg.reply(error.message);
                         }
                     }

@@ -37,6 +37,7 @@ module.exports = async function startWhatsapp() {
     });
 
     client.on('disconnected', (reason) => {
+        console.log();
         console.log(chalk.yellowBright('[cosmos_wabot]') + ' was ' + chalk.white.bgRedBright.bold('DISCONNECTED') + chalk.white(', reason: ') + chalk.white.bgRedBright.bold(`${reason}`));
         client.initialize();
     });

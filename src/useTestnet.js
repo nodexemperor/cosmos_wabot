@@ -7,7 +7,7 @@ module.exports = async function useTestnet(network) {
     const requiredVars = {'apiUrl': `API`, 'valoper': `VALOPER`, 'valcons': `VALCONS`};
     for (const varName in requiredVars) {
         if (!vars[varName]) {
-        throw new Error(`[${network}] doesn't have ${network.toUpperCase()}_${requiredVars[varName]} check your .env`);
+        throw new Error(`${network.toUpperCase()}_${requiredVars[varName]} 💀⁉️ please check your .env`);
         }
     }
 
@@ -22,7 +22,6 @@ module.exports = async function useTestnet(network) {
 
         return validatorInfo;
         } catch (error) {
-        console.error(error);
-    
+        throw new Error(`${network}: ${error.message.toLowerCase()}`);
     }
 }

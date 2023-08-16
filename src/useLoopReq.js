@@ -12,6 +12,10 @@ const stopLoop = async (networkInputs, chat) => {
                 clearInterval(networks[networkInput].intervalId);
                 networks[networkInput].intervalId = null;
             }
+            // if (networks[networkInput].messageIntervalId) {
+            //     clearInterval(networks[networkInput].messageIntervalId);
+            //     networks[networkInput].messageIntervalId = null;
+            // }
             if (networks[networkInput].lastStatusMessage) {
                 await networks[networkInput].lastStatusMessage.delete(true);
                 networks[networkInput].lastStatusMessage = null;
@@ -29,15 +33,18 @@ module.exports = {
     startMainnetLoop: async (client, networkInputs, intervalString, chat) => {
         const stopIndex = networkInputs.indexOf('--stop');
         if (stopIndex !== -1) {
+        const networkToStop = networkInputs[stopIndex];
             networkInputs.splice(stopIndex, 1);
-            stopLoop(networkInputs, chat);
-        return;
+                await stopLoop([networkToStop], chat);
+            delete networks[networkToStop];
+            if (networkInputs.length === 0) return;
     }
 
         const intervalNumber = parseInt(intervalString.slice(0, -1));
         const intervalUnit = intervalString.slice(-1);
         if (isNaN(intervalNumber) || (intervalUnit !== 'm' && intervalUnit !== 'h')) {
             chat.sendMessage('Invalid command format. Use ```/mainnet <network> <interval | --stop>```, where ```<interval>``` is a number followed by "m" (for minutes) or "h" (for hours).');
+            console.log(chalk.white.bgRedBright.bold('ERROR') + " [" + chalk.redBright(`${networkInputs.join(', ')}`) + "] INVALID INPUT OR WRONG INTERVAL");
             return;
         }
         const intervalMillis = intervalUnit === 'm' ? intervalNumber * 60 * 1000 : intervalNumber * 60 * 60 * 1000;
@@ -55,9 +62,14 @@ module.exports = {
             }
         
             const updateStatus = async () => {
+            try {
                 const statusMainnet = await useMainnet(networkInput);
                 if (networks[networkInput]) { 
                 networks[networkInput].lastStatusMainnet = statusMainnet;
+                }
+                    } catch (error) {
+                    // use only debug
+                    // console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "]");
                 }
             };
 
@@ -70,9 +82,15 @@ module.exports = {
 
         const messageIntervalId = setInterval(async () => {
             let statusMessage = '';
+            let count = 0;
             for (const networkInput of networkInputs) {
                 if (networks[networkInput] && networks[networkInput].lastStatusMainnet) {
-                    statusMessage += networks[networkInput].lastStatusMainnet + `\n------------------------------------------------------------------\n`;
+            
+                if(count > 0) {
+                    statusMessage += `\n------------------------------------------------------------------\n`;
+                }
+                    statusMessage += networks[networkInput].lastStatusMainnet;
+                    count++;
                 }
             }
 
@@ -80,8 +98,8 @@ module.exports = {
                 if (networks[networkInput] && networks[networkInput].lastStatusMessage) {
                     try {
                         await networks[networkInput].lastStatusMessage.delete(true);
-                    } catch (error) {
-                        console.log(chalk.white.bgYellowBright.bold('WARN') + " [" + chalk.greenBright(`${networkInput}`) + "] CONTINUE FOR LOOPING");
+                    } catch (log) {
+                        console.log(chalk.white.bgYellowBright.bold('WARN') + " [" + chalk.blueBright(`${networkInput}`) + "] MAINNET CONTINUE FOR LOOPING");
                     }
                     networks[networkInput].lastStatusMessage = null;
                 }
@@ -102,27 +120,30 @@ module.exports = {
             if (networks[networkInput]) {
                 networks[networkInput].messageIntervalId = messageIntervalId;
             }
-        
-            // const startMessage = `Started sending mainnet ${networkInputs.join(', ')} status updates every ${intervalNumber} ${intervalUnitWord}.`;
-            // startMessages.push(startMessage);
-
         });
 
         chat.sendMessage(`Started sending mainnet ${networkInputs.join(', ')} status updates every ${intervalNumber} ${intervalUnitWord}.`);
+        console.log(chalk.white.bgGreenBright.bold('SUCCESS') +
+        " [" + chalk.blueBright(`${networkInputs.join(', ')}`) + "] STARTED SENDING LOOPING EVERY" +
+        " [" + chalk.blueBright(`${intervalNumber}`) + "] [" + chalk.blueBright(`${intervalUnitWord.toUpperCase()}`) + "]");
+
     },
 
     startTestnetLoop: async (client, networkInputs, intervalString, chat) => {
         const stopIndex = networkInputs.indexOf('--stop');
         if (stopIndex !== -1) {
+        const networkToStop = networkInputs[stopIndex];
             networkInputs.splice(stopIndex, 1);
-            stopLoop(networkInputs, chat);
-            return;
+                await stopLoop([networkToStop], chat);
+            delete networks[networkToStop];
+            if (networkInputs.length === 0) return;
         }
 
         const intervalNumber = parseInt(intervalString.slice(0, -1));
         const intervalUnit = intervalString.slice(-1);
         if (isNaN(intervalNumber) || (intervalUnit !== 'm' && intervalUnit !== 'h')) {
             chat.sendMessage('Invalid command format. Use ```/testnet <network> <interval | --stop>```, where ```<interval>``` is a number followed by "m" (for minutes) or "h" (for hours).');
+            console.log(chalk.white.bgRedBright.bold('ERROR') + " [" + chalk.redBright(`${networkInputs.join(', ')}`) + "] INVALID INPUT OR WRONG INTERVAL");
             return;
         }
         const intervalMillis = intervalUnit === 'm' ? intervalNumber * 60 * 1000 : intervalNumber * 60 * 60 * 1000;
@@ -140,8 +161,15 @@ module.exports = {
             }
 
             const updateStatus = async () => {
+            try {
                 const statusTestnet = await useTestnet(networkInput);
+                if (networks[networkInput]) { 
                 networks[networkInput].lastStatusTestnet = statusTestnet;
+                }
+                    } catch (error) {
+                    // use only debug
+                    // console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "]");
+                }
             };
 
             updateStatus();
@@ -153,9 +181,15 @@ module.exports = {
 
         const messageIntervalId = setInterval(async () => {
             let statusMessage = '';
+            let count = 0;
             for (const networkInput of networkInputs) {
                 if (networks[networkInput] && networks[networkInput].lastStatusTestnet) {
-                    statusMessage += networks[networkInput].lastStatusTestnet + `\n------------------------------------------------------------------\n`;
+            
+                if(count > 0) {
+                    statusMessage += `\n------------------------------------------------------------------\n`;
+                }
+                    statusMessage += networks[networkInput].lastStatusTestnet;
+                    count++;
                 }
             }
 
@@ -163,8 +197,8 @@ module.exports = {
                 if (networks[networkInput] && networks[networkInput].lastStatusMessage) {
                     try {
                         await networks[networkInput].lastStatusMessage.delete(true);
-                    } catch (error) {
-                        console.error(`WARN [${networkInput}] not delete`);
+                    } catch (log) {
+                        console.log(chalk.white.bgYellowBright.bold('WARN') + " [" + chalk.blueBright(`${networkInput}`) + "] TESTNET CONTINUE FOR LOOPING");
                     }
                     networks[networkInput].lastStatusMessage = null;
                 }
@@ -188,6 +222,9 @@ module.exports = {
         });
 
         chat.sendMessage(`Started sending testnet ${networkInputs.join(', ')} status updates every ${intervalNumber} ${intervalUnitWord}.`);
+        console.log(chalk.white.bgGreenBright.bold('SUCCESS') +
+        " [" + chalk.blueBright(`${networkInputs.join(', ')}`) + "] STARTED SENDING LOOPING EVERY" +
+        " [" + chalk.blueBright(`${intervalNumber}`) + "] [" + chalk.blueBright(`${intervalUnitWord.toUpperCase()}`) + "]");
     },
 
     stopLoop
