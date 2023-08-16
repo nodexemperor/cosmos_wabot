@@ -30,8 +30,6 @@ module.exports = async function useMainnet(network) {
 
         return statusNode + validatorInfo;
         } catch (error) {
-        console.error(error);
-        throw error;
-    
+        throw new Error(`${network}: ${error.message.toLowerCase()}`);
     }
 }
