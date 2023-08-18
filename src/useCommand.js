@@ -71,14 +71,14 @@ module.exports = async function useCommand(msg, client, chat) {
                                     const stopMessages = await stopLoop(networks, chat);
                                     for (const stopMessage of stopMessages) {
                                         await msg.reply(stopMessage)
-                                        console.log(chalk.white.bgRedBright.bold('STOPING') + " [" + chalk.redBright(`${stopMessage}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
+                                        console.log(chalk.white.bgRedBright.bold('STOPPING') + " [" + chalk.redBright(`${stopMessage}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                         }
                                     }
                         } else {
                             for (const network of networks) {
                                 try {
                                     await useMainnet(network);
-                                    console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPERING FOR LOOPING");
+                                    console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPARING MAINNET FOR LOOPING");
                                 } catch (error) {
                                     console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                     errors.push(error.message);
@@ -118,14 +118,14 @@ module.exports = async function useCommand(msg, client, chat) {
                                 const stopMessages = await stopLoop(networks, chat);
                                 for (const stopMessage of stopMessages) {
                                     await msg.reply(stopMessage)
-                                    console.log(chalk.white.bgRedBright.bold('STOPING') + " [" + chalk.redBright(`${stopMessage}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
+                                    console.log(chalk.white.bgRedBright.bold('STOPPING') + " [" + chalk.redBright(`${stopMessage}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                     }
                                 }
                     } else {
                             for (const network of networks) {
                                 try {
                                     await useTestnet(network);
-                                    console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPERING FOR LOOPING");
+                                    console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPARING TESTNET FOR LOOPING");
                                 } catch (error) {
                                     console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
                                     errors.push(error.message);
