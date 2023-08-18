@@ -1,7 +1,12 @@
 const getApi = require('./getApi');
 
 module.exports = async function useApi({ apiUrl, valoper, valcons, denom, exponent, coingecko }) {
-  const apiData = await getApi({ apiUrl, coingecko, valoper, valcons });
+  let apiData;
+    if (coingecko) {
+      apiData = await getApi({ apiUrl, coingecko, valoper, valcons });
+    } else {
+      apiData = await getApi({ apiUrl, valoper, valcons });
+}
     
     // summary
     const height = apiData.summaryApi.data.block.header.height;
@@ -47,7 +52,7 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
     function convertStatus(status) {
         if (status === 'BOND_STATUS_BONDED') {
           return 'Active';
-        } else if (status === 'BOND_STATUS_UNBONDED') {
+        } else if (status === 'BOND_STATUS_UNBONDED', 'BOND_STATUS_UNBONDING') {
           return 'Inactive';
         } else {
           return status;
@@ -55,6 +60,10 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
     }
     const bondStatus = convertStatus(validator.status);
 
+    let commissions = "N/A";
+
+    if (apiData.commissionApi) {
+      if (apiData.commissionApi.data.commission) {
     const commission = apiData.commissionApi.data.commission.commission;
     let commissionAmount = null;
 
@@ -65,10 +74,12 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
       }
     }
 
-    let commissions = "N/A";
     if (commissionAmount) {
-    const commissionFormated = parseFloat(commissionAmount) / (10 ** exponent);
-    commissions = commissionFormated.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2});}
+        const commissionFormated = parseFloat(commissionAmount) / (10 ** exponent);
+        commissions = commissionFormated.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+      }
+    }
 
     const bondedFormated = Number(BigInt(validator.tokens) / BigInt(10 ** exponent));
     const totalBonded = bondedFormated.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});

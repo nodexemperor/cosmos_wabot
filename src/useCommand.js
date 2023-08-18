@@ -10,13 +10,24 @@ module.exports = async function useCommand(msg, client, chat) {
     const user = await msg.getContact();
     const userName = user.pushname || user.verifiedName || user.formattedName;
     const time = new Date().toLocaleString().split(', ')[1];
-    const idMessage = msg.id._serialized.split('_').pop();
-    // const number = msg.from.replace('@c.us', '');
+    const idMessageParts = msg.id._serialized.split('_');
+    let idMessage;
+    let number;
 
-    console.log(chalk.white.bgYellowBright.bold('RECEIVED') +
+    if (msg.from.includes('@g.us', '@c.us')) {
+            idMessage = idMessageParts[idMessageParts.length - 2];
+            number = idMessageParts[idMessageParts.length - 1].split('@')[0];
+    } if (msg.from.includes('@c.us')) {
+            idMessage = idMessageParts.pop();
+            number = msg.from.replace('@c.us', '');
+    }
+    
+    console.log(chalk.white.bgMagentaBright.bold('RECEIVED') +
     " [" + chalk.blueBright(`${msg.body}`) + "] " +
-    chalk.green('ID') +
+    chalk.green('ID MSG') +
     " [" + chalk.blueBright(`${idMessage}`) + "] " +
+    chalk.green('NUMBER') +
+    " [" + chalk.blueBright(`+${number}`) + "] " +
     chalk.green('SENDER') +
     " [" + chalk.blueBright(`${userName}`) + "] " +
     chalk.green('TIME') +
@@ -66,7 +77,7 @@ module.exports = async function useCommand(msg, client, chat) {
                         } else {
                             for (const network of networks) {
                                 try {
-                                    // await useMainnet(network);
+                                    await useMainnet(network);
                                     console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPERING FOR LOOPING");
                                 } catch (error) {
                                     console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");
@@ -113,7 +124,7 @@ module.exports = async function useCommand(msg, client, chat) {
                     } else {
                             for (const network of networks) {
                                 try {
-                                    // await useTestnet(network);
+                                    await useTestnet(network);
                                     console.log(chalk.white.bgYellowBright.bold('GET') + " [" + chalk.blueBright(`${network}`) + "] PREPERING FOR LOOPING");
                                 } catch (error) {
                                     console.error(chalk.white.bgRed.bold('ERROR') + " [" + chalk.redBright(`${error.message}`) + "] " + chalk.green('RECIPIENT') + " [" + chalk.blueBright(`${userName}`) + "]");

@@ -22,6 +22,7 @@ module.exports = async function useTestnet(network) {
 
         return validatorInfo;
         } catch (error) {
+        // console.error(error)
         throw new Error(`${network}: ${error.message.toLowerCase()}`);
     }
 }

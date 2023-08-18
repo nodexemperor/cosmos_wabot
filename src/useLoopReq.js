@@ -23,7 +23,7 @@ const stopLoop = async (networkInputs, chat) => {
             messages.push(`Stopped sending ${networkInput} status updates.`);
             delete networks[networkInput];
         } else {
-            messages.push(`ERROR no status ${networkInput} updates to stop 💀⁉️`);
+            messages.push(`No status ${networkInput} updates to stop 💀⁉️`);
         }
     }
     return messages;

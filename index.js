@@ -13,6 +13,7 @@ const start = async () => {
         const reply = await useCommand(msg, client, chat);
         if (reply) {
             msg.reply(reply);
+            console.log(reply)
         }
     });
 
