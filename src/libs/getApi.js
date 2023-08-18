@@ -1,12 +1,17 @@
 const axios = require('axios');
+const axiosRetry = require('axios-retry');
+
+axiosRetry(axios, { retries: 5, retryDelay: axiosRetry.exponentialDelay });
 
 module.exports = async function getApiData({ apiUrl, coingecko, valoper, valcons }) {
   const summaryApi = await axios.get(`${apiUrl}/cosmos/base/tendermint/v1beta1/blocks/latest`);
 
   let coingeckoApi;
     try {
+        // https://api.coingecko.com/api/v3/coins/${coingecko}
         coingeckoApi = await axios.get(`https://api.coingecko.com/api/v3/simple/price?ids=${coingecko}&vs_currencies=usd`);
     } catch (error) {
+        coingeckoApi = null;
       if (error.response && error.response.status === 429) {
       } else {
         throw error;

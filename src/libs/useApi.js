@@ -17,12 +17,17 @@ module.exports = async function useApi({ apiUrl, valoper, valcons, denom, expone
     const secondsAgo = Math.round((fetchedAt - latestBlockTime) / 1000);
 
     let tokenPrice = ' -';
-    if (coingecko !== "") {
-    tokenPrice = apiData.coingeckoApi.data[coingecko].usd;
-    if (tokenPrice >= 1) {
-        tokenPrice = tokenPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+    if (apiData.coingeckoApi) {
+      if (apiData.coingeckoApi.data[coingecko]) {
+    if (coingecko !== null) {
+        tokenPrice = apiData.coingeckoApi.data[coingecko].usd;
+        if (tokenPrice >= 1) {
+            tokenPrice = tokenPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+          }
         }
-    }    
+      }
+    }
 
     // summary
 
