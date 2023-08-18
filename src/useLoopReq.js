@@ -87,7 +87,7 @@ module.exports = {
                 if (networks[networkInput] && networks[networkInput].lastStatusMainnet) {
             
                 if(count > 0) {
-                    statusMessage += `\n------------------------------------------------------------------\n`;
+                    statusMessage += `\n---------------------------------------------------------------\n`;
                 }
                     statusMessage += networks[networkInput].lastStatusMainnet;
                     count++;
@@ -186,7 +186,7 @@ module.exports = {
                 if (networks[networkInput] && networks[networkInput].lastStatusTestnet) {
             
                 if(count > 0) {
-                    statusMessage += `\n------------------------------------------------------------------\n`;
+                    statusMessage += `\n---------------------------------------------------------------\n`;
                 }
                     statusMessage += networks[networkInput].lastStatusTestnet;
                     count++;
