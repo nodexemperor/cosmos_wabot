@@ -16,7 +16,8 @@ module.exports = async function startWhatsapp() {
     const client = new Client({
         puppeteer: {
             args: puppeteerArgs
-        }
+    },
+        logLevel: 'verbose'
     });
 
     client.on('qr', async (qr) => {
