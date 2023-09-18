@@ -22,7 +22,7 @@
         "puppeteer": "^21.1.1",
         "qrcode-terminal": "^0.12.0",
         "validator": "^13.9.0",
-        "whatsapp-web.js": "^1.22.2-alpha.0"
+        "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#152f0a64cdffdfb4d638043f537f87b2a6ebc492"
     },
     "devDependencies": {
         "@babel/cli": "^7.22.9",
