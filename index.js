@@ -1,5 +1,5 @@
 //
-// Copyright (C) 2023 sxlzptprjkt And NodeX Emperor, LLC
+// Copyright (C) 2023 NodeX Emperor, LLC
 //
 
 require('dotenv').config();
